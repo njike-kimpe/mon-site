@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat WhatsApp - Stague Jordan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #e5ddd5, #d1c7bd);
+            height: 100vh;
+        }
+
+        .chat-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+            margin: 0 auto;
+            background: #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #128c7e, #075e54);
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .profile-pic:hover {
+            transform: scale(1.1);
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-name {
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .online-status {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+            font-size: 18px;
+        }
+
+        .header-icons span {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .header-icons span:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .chat-area {
+            flex: 1;
+            background: linear-gradient(135deg, #e5ddd5, #f0f0f0);
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.1s;
+        }
+
+        .message.sent {
+            align-items: flex-end;
+        }
+
+        .message.received {
+            align-items: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 15px;
+            word-wrap: break-word;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .message-bubble:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .message.sent .message-bubble {
+            background: linear-gradient(135deg, #dcf8c6, #c8e6c9);
+        }
+
+        .message.received .message-bubble {
+            background: linear-gradient(135deg, #fff, #f8f8f8);
+        }
+
+        .message-text {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 2px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #667781;
+            text-align: right;
+        }
+
+        .message.received .message-time {
+            text-align: left;
+        }
+
+        .date-separator {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .date-badge {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,240,240,0.9));
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #667781;
+            display: inline-block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .quoted-message {
+            border-left: 3px solid #128c7e;
+            padding: 6px 8px;
+            margin-bottom: 5px;
+            background: rgba(18, 140, 126, 0.1);
+            border-radius: 8px;
+        }
+
+        .quoted-sender {
+            font-size: 12px;
+            color: #128c7e;
+            font-weight: 500;
+        }
+
+        .quoted-text {
+            font-size: 12px;
+            color: #667781;
+        }
+
+        .voice-message {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #e8f5e8, #d4edda);
+            padding: 8px;
+            border-radius: 20px;
+            min-width: 150px;
+        }
+
+        .voice-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #128c7e;
+            color: white;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .voice-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .voice-duration {
+            font-size: 12px;
+            color: #667781;
+        }
+
+        .voice-wave {
+            flex: 1;
+            height: 20px;
+            background: linear-gradient(90deg, #128c7e, #4ecdc4, #128c7e);
+            background-size: 200% 100%;
+            border-radius: 10px;
+            animation: wave 2s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .input-area {
+            background: linear-gradient(135deg, #f0f0f0, #e8e8e8);
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .input-box {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 25px;
+            background: white;
+            font-size: 14px;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: box-shadow 0.2s;
+        }
+
+        .input-box:focus {
+            box-shadow: 0 0 0 2px #128c7e, 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #128c7e, #075e54);
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(18, 140, 126, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(18, 140, 126, 0.4);
+        }
+
+        .recording {
+            background: linear-gradient(135deg, #ff6b6b, #e74c3c) !important;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .contacts-panel, .group-panel {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            transition: left 0.3s;
+            z-index: 1000;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.2);
+        }
+
+        .contacts-panel.show, .group-panel.show {
+            left: 0;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #128c7e, #075e54);
+            color: white;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .panel-content {
+            padding: 20px;
+        }
+
+        .contact-item, .group-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+
+        .contact-item:hover, .group-item:hover {
+            background: linear-gradient(135deg, #f0f8ff, #e8f4fd);
+        }
+
+        .swipe-indicator {
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #128c7e;
+            color: white;
+            padding: 5px 8px;
+            border-radius: 15px;
+            font-size: 12px;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+
+        .message.swiping .swipe-indicator {
+            opacity: 1;
+            right: -60px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay" onclick="closeAllPanels()"></div>
+
+    <div class="contacts-panel" id="contactsPanel">
+        <div class="panel-header">
+            Contacts
+            <span style="float: right; cursor: pointer;" onclick="closeAllPanels()">✕</span>
+        </div>
+        <div class="panel-content">
+            <div class="contact-item" onclick="addContact()">
+                <strong>➕ Ajouter un contact</strong>
+            </div>
+            <div id="contactsList">
+                <div class="contact-item" onclick="selectContact('Stague Jordan')">👤 Stague Jordan</div>
+                <div class="contact-item" onclick="selectContact('Njike Joachim')">👤 Njike Joachim</div>
+                <div class="contact-item" onclick="selectContact('Paul Mbeng')">👤 Paul Mbeng</div>
+                <div class="contact-item" onclick="selectContact('Marie Fotso')">👤 Marie Fotso</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="group-panel" id="groupPanel">
+        <div class="panel-header">
+            Groupes
+            <span style="float: right; cursor: pointer;" onclick="closeAllPanels()">✕</span>
+        </div>
+        <div class="panel-content">
+            <div class="group-item" onclick="createGroup()">
+                <strong>➕ Créer un groupe</strong>
+            </div>
+            <div id="groupsList">
+                <div class="group-item" onclick="selectGroup('Famille Njike')">👥 Famille Njike</div>
+                <div class="group-item" onclick="selectGroup('Amis Douala')">👥 Amis Douala</div>
+                <div class="group-item" onclick="selectGroup('Travail')">👥 Travail</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-container">
+        <div class="header">
+            <div class="profile-pic" onclick="showContacts()">👤</div>
+            <div class="contact-info">
+                <div class="contact-name" id="contactName">Stague Jordan 🔥</div>
+                <div class="online-status" id="onlineStatus">en ligne</div>
+            </div>
+            <div class="header-icons">
+                <span onclick="showGroups()" title="Groupes">👥</span>
+                <span onclick="makeCall()" title="Appeler">📞</span>
+            </div>
+        </div>
+
+        <div class="chat-area" id="chatArea">
+            <div class="message sent">
+                <div class="message-bubble">
+                    <div class="message-text">Salut Jordan, tu es où maintenant ?</div>
+                    <div class="message-time">08:15 ✓✓</div>
+                </div>
+            </div>
+
+            <div class="message received">
+                <div class="message-bubble" ontouchstart="startSwipe(event)" ontouchmove="handleSwipe(event)" ontouchend="endSwipe(event)">
+                    <div class="swipe-indicator">Répondre</div>
+                    <div class="message-text">Je suis à Akwa maintenant frère</div>
+                    <div class="message-time">08:17</div>
+                </div>
+            </div>
+
+            <div class="message sent">
+                <div class="message-bubble">
+                    <div class="message-text">Ok, tu peux passer chez moi ?</div>
+                    <div class="message-time">08:18 ✓✓</div>
+                </div>
+            </div>
+
+            <div class="message received">
+                <div class="message-bubble" ontouchstart="startSwipe(event)" ontouchmove="handleSwipe(event)" ontouchend="endSwipe(event)">
+                    <div class="swipe-indicator">Répondre</div>
+                    <div class="voice-message">
+                        <button class="voice-btn" onclick="playVoice(this)">▶</button>
+                        <div class="voice-wave"></div>
+                        <div class="voice-duration">0:12</div>
+                    </div>
+                    <div class="message-time">08:20</div>
+                </div>
+            </div>
+
+            <div class="date-separator">
+                <div class="date-badge">aujourd'hui</div>
+            </div>
+
+            <div class="message received">
+                <div class="message-bubble" ontouchstart="startSwipe(event)" ontouchmove="handleSwipe(event)" ontouchend="endSwipe(event)">
+                    <div class="swipe-indicator">Répondre</div>
+                    <div class="message-text">Joachim, j'arrive dans 30 minutes. Tu me dis où exactement à Bonamoussadi</div>
+                    <div class="message-time">14:25</div>
+                </div>
+            </div>
+
+            <div class="message sent">
+                <div class="message-bubble">
+                    <div class="quoted-message">
+                        <div class="quoted-sender">Stague Jordan</div>
+                        <div class="quoted-text">Joachim, j'arrive dans 30 minutes...</div>
+                    </div>
+                    <div class="message-text">Ok, je t'envoie la localisation maintenant</div>
+                    <div class="message-time">14:26 ✓✓</div>
+                </div>
+            </div>
+
+            <div class="message sent">
+                <div class="message-bubble">
+                    <div class="message-text">📍 Carrefour Omnisports Bonamoussadi</div>
+                    <div class="message-time">14:26 ✓✓</div>
+                </div>
+            </div>
+
+            <div class="message received">
+                <div class="message-bubble" ontouchstart="startSwipe(event)" ontouchmove="handleSwipe(event)" ontouchend="endSwipe(event)">
+                    <div class="swipe-indicator">Répondre</div>
+                    <div class="message-text">Perfect ! J'arrive 🚗</div>
+                    <div class="message-time">14:27</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" class="input-box" id="messageInput" placeholder="Tapez un message..." onkeypress="handleKeyPress(event)">
+            <button class="action-btn" id="voiceBtn" onmousedown="startRecording()" onmouseup="stopRecording()" ontouchstart="startRecording()" ontouchend="stopRecording()">🎤</button>
+            <button class="action-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        let isRecording = false;
+        let swipeStartX = 0;
+        let swipeElement = null;
+        let replyingTo = null;
+        let contacts = ['Stague Jordan', 'Njike Joachim', 'Paul Mbeng', 'Marie Fotso'];
+        let groups = ['Famille Njike', 'Amis Douala', 'Travail'];
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessage(message, true);
+                input.value = '';
+                clearReply();
+                
+                setTimeout(() => {
+                    const responses = [
+                        "Ok frère, je note ça 👍", 
+                        "D'accord Joachim", 
+                        "Merci mon gars!", 
+                        "C'est bon, j'ai vu", 
+                        "Parfait! 🔥",
+                        "Reçu et compris",
+                        "Ça marche comme ça"
+                    ];
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    addMessage(randomResponse, false);
+                }, 1500);
+            }
+        }
+
+        function addMessage(text, isSent = false) {
+            const chatArea = document.getElementById('chatArea');
+            const messageDiv = document.createElement('div');
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            
+            messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+            
+            let replyHtml = '';
+            if (replyingTo && isSent) {
+                replyHtml = `
+                    <div class="quoted-message">
+                        <div class="quoted-sender">${replyingTo.sender}</div>
+                        <div class="quoted-text">${replyingTo.text}</div>
+                    </div>
+                `;
+            }
+            
+            const swipeAttrs = !isSent ? `ontouchstart="startSwipe(event)" ontouchmove="handleSwipe(event)" ontouchend="endSwipe(event)"` : '';
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble" ${swipeAttrs}>
+                    ${!isSent ? '<div class="swipe-indicator">Répondre</div>' : ''}
+                    ${replyHtml}
+                    <div class="message-text">${text}</div>
+                    <div class="message-time">${time} ${isSent ? '✓✓' : ''}</div>
+                </div>
+            `;
+            
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function startRecording() {
+            isRecording = true;
+            const voiceBtn = document.getElementById('voiceBtn');
+            voiceBtn.classList.add('recording');
+            voiceBtn.textContent = '⏹';
+        }
+
+        function stopRecording() {
+            if (isRecording) {
+                isRecording = false;
+                const voiceBtn = document.getElementById('voiceBtn');
+                voiceBtn.classList.remove('recording');
+                voiceBtn.textContent = '🎤';
+                
+                addVoiceMessage();
+            }
+        }
+
+        function addVoiceMessage() {
+            const chatArea = document.getElementById('chatArea');
+            const messageDiv = document.createElement('div');
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            
+            messageDiv.className = 'message sent';
+            messageDiv.innerHTML = `
+                <div class="message-bubble">
+                    <div class="voice-message">
+                        <button class="voice-btn" onclick="playVoice(this)">▶</button>
+                        <div class="voice-wave"></div>
+                        <div class="voice-duration">0:0${Math.floor(Math.random() * 9) + 1}</div>
+                    </div>
+                    <div class="message-time">${time} ✓✓</div>
+                </div>
+            `;
+            
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function playVoice(btn) {
+            btn.textContent = btn.textContent === '▶' ? '⏸' : '▶';
+        }
+
+        function startSwipe(e) {
+            swipeStartX = e.touches[0].clientX;
+            swipeElement = e.currentTarget;
+        }
+
+        function handleSwipe(e) {
+            if (!swipeElement) return;
+            
+            const currentX = e.touches[0].clientX;
+            const diffX = currentX - swipeStartX;
+            
+            if (diffX > 20) {
+                swipeElement.style.transform = `translateX(${Math.min(diffX, 80)}px)`;
+                swipeElement.classList.add('swiping');
+            }
+        }
+
+        function endSwipe(e) {
+            if (!swipeElement) return;
+            
+            const finalX = e.changedTouches[0].clientX;
+            const diffX = finalX - swipeStartX;
+            
+            if (diffX > 60) {
+                const messageText = swipeElement.querySelector('.message-text').textContent;
+                replyingTo = {
+                    sender: 'Stague Jordan',
+                    text: messageText
+                };
+                document.getElementById('messageInput').placeholder = `Répondre à: ${messageText.substring(0, 30)}...`;
+            }
+            
+            swipeElement.style.transform = '';
+            swipeElement.classList.remove('swiping');
+            swipeElement = null;
+        }
+
+        function clearReply() {
+            replyingTo = null;
+            document.getElementById('messageInput').placeholder = 'Tapez un message...';
+        }
+
+        function showContacts() {
+            document.getElementById('contactsPanel').classList.add('show');
+            document.getElementById('overlay').classList.add('show');
+        }
+
+        function showGroups() {
+            document.getElementById('groupPanel').classList.add('show');
+            document.getElementById('overlay').classList.add('show');
+        }
+
+        function closeAllPanels() {
+            document.getElementById('contactsPanel').classList.remove('show');
+            document.getElementById('groupPanel').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        function selectContact(name) {
+            document.getElementById('contactName').textContent = name + (name === 'Stague Jordan' ? ' 🔥' : name === 'Njike Joachim' ? ' 💪' : ' 😊');
+            closeAllPanels();
+        }
+
+        function selectGroup(name) {
+            document.getElementById('contactName').textContent = name + ' 👥';
+            closeAllPanels();
+        }
+
+        function addContact() {
+            const name = prompt('Nom du contact:');
+            if (name) {
+                contacts.push(name);
+                updateContactsList();
+            }
+        }
+
+        function createGroup() {
+            const name = prompt('Nom du groupe:');
+            if (name) {
+                groups.push(name);
+                updateGroupsList();
+            }
+        }
+
+        function updateContactsList() {
+            const list = document.getElementById('contactsList');
+            list.innerHTML = contacts.map(contact => 
+                `<div class="contact-item" onclick="selectContact('${contact}')">👤 ${contact}</div>`
+            ).join('');
+        }
+
+        function updateGroupsList() {
+            const list = document.getElementById('groupsList');
+            list.innerHTML = groups.map(group => 
+                `<div class="group-item" onclick="selectGroup('${group}')">👥 ${group}</div>`
+            ).join('');
+        }
+
+        function makeCall() {
+            alert('Appel vers Stague Jordan en cours... 📞');
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Initialisation
+        updateContactsList();
+        updateGroupsList();
+    </script>
+</body>
+</html>
